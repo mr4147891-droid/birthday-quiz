@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Birthday Quiz for Sara</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: linear-gradient(135deg, #ffdde1, #ee9ca7);
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+      overflow-x: hidden;
+    }
+    .quiz-container {
+      background: white;
+      border-radius: 15px;
+      padding: 20px;
+      max-width: 600px;
+      margin: 30px auto;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    h1 { color: #e60073; }
+    .question { font-size: 20px; margin: 20px 0; }
+    .options {
+      display: flex;
+      flex-direction: column; 
+      align-items: center;
+    }
+    .options button {
+      width: 80%; 
+      margin: 10px 0; 
+      padding: 12px 20px;
+      border: none;
+      border-radius: 10px;
+      background: #ff4da6;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .options button:hover { background: #cc0066; }
+    .hidden { display: none; }
+    .cake {
+      font-size: 100px;
+      animation: bounce 1s infinite;
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    #emoji-rain span {
+      position: fixed;
+      font-size: 20px;
+      z-index: 9999;
+      pointer-events: none;
+      user-select: none;
+    }
+    #typing-text {
+      font-size: 18px;
+      margin-top: 15px;
+      color: #e60073;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="quiz-container" id="quiz">
+    <h1>Birthday Quiz 🎂</h1>
+    <div id="question" class="question"></div>
+    <div id="options" class="options"></div>
+    <div id="result" class="hidden"></div>
+  </div>
+
+  <div id="emoji-rain"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+  <script>
+    const quizData = [
+      { question: "When did we first meet?", options: ["15th August 2020", "7th April 2025", "20th September 2008", "1st January 2024"], answer: "7th April 2025" },
+      { question: "When did we say 'I Love You' to each other?", options: ["7th April 2025", "1st January 2025", "21st April 2025", "14th February 2023"], answer: "21st April 2025" },
+      { question: "Which nature of yours do I love the most?", options: ["Funny nature", "Modern nature", "Islamic nature", "Angry nature"], answer: "Islamic nature" },
+      { question: "What was the Ramadan on 20th September 2008?", options: ["10 Ramadan", "25 Ramadan", "20 Ramadan", "15 Ramadan"], answer: "20 Ramadan" },
+      { question: "Which day of the week did we meet?", options: ["Wednesday", "Sunday", "Monday", "Tuesday"], answer: "Monday" },
+      { question: "Who is the queen of Mishr (Egypt)?", options: ["Haneen", "Sara", "Amina", "Fatima"], answer: "Sara" },
+      { question: "Name the girl I can never forget?", options: ["Haneen", "Sara", "Jannat", "Mona"], answer: "Sara" },
+      { question: "What is the most important thing in love?", options: ["Money", "Trust", "Beauty", "Fun"], answer: "Trust" },
+      { question: "Which state of India do I live in?", options: ["Uttar Pradesh", "Bihar", "Rajasthan", "Maharashtra"], answer: "Bihar" },
+      { question: "How many months have passed since we met?", options: ["7 months", "3 months", "5 months", "10 months"], answer: "5 months" }
+    ];
+
+    let currentQuestion = 0;
+    const questionEl = document.getElementById("question");
+    const optionsEl = document.getElementById("options");
+    const resultEl = document.getElementById("result");
+    const emojiRain = document.getElementById("emoji-rain");
+
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    function loadQuestion() {
+      if (currentQuestion < quizData.length) {
+        const q = quizData[currentQuestion];
+        questionEl.textContent = q.question;
+        optionsEl.innerHTML = "";
+
+        const shuffledOptions = shuffleArray([...q.options]);
+        shuffledOptions.forEach(option => {
+          const btn = document.createElement("button");
+          btn.textContent = option;
+          btn.onclick = () => checkAnswer(option, q.answer);
+          optionsEl.appendChild(btn);
+        });
+      } else {
+        showResult();
+      }
+    }
+
+    function checkAnswer(selected, correct) {
+      if (selected === correct) {
+        currentQuestion++;
+        loadQuestion();
+      } else {
+        alert("Oops! Try again 😅");
+      }
+    }
+
+    function showResult() {
+      questionEl.classList.add("hidden");
+      optionsEl.classList.add("hidden");
+      resultEl.classList.remove("hidden");
+
+      // Confetti effect
+      const duration = 5 * 1000;
+      const animationEnd = Date.now() + duration;
+      const colors = ['#ff4da6', '#ffb6c1', '#ffe066', '#8cff66', '#66d9ff'];
+
+      (function frame() {
+        confetti({
+          particleCount: 5,
+          angle: 60,
+          spread: 55,
+          origin: { x: 0 },
+          colors: colors
+        });
+        confetti({
+          particleCount: 5,
+          angle: 120,
+          spread: 55,
+          origin: { x: 1 },
+          colors: colors
+        });
+
+        if (Date.now() < animationEnd) {
+          requestAnimationFrame(frame);
+        }
+      }());
+
+      // Emoji rain
+      const emojis = ["💖","🌸","🎉","✨","🎂"];
+      for(let i=0;i<50;i++){
+        const span = document.createElement("span");
+        span.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+        span.style.left = Math.random()*100+"%";
+        span.style.animation = `fall ${3+Math.random()*3}s linear`;
+        emojiRain.appendChild(span);
+      }
+
+      // Typing effect
+      const message = "Happy Birthday Sara! 🌸💖 May Allah always bless you with happiness and smiles ✨🎉";
+      let index = 0;
+      const typingText = document.createElement("div");
+      typingText.id = "typing-text";
+      resultEl.appendChild(typingText);
+
+      function type() {
+        if(index < message.length){
+          typingText.textContent += message.charAt(index);
+          index++;
+          setTimeout(type,50);
+        }
+      }
+      type();
+
+      // Cake and button
+      const cake = document.createElement("div");
+      cake.className = "cake";
+      cake.textContent = "🎂";
+      resultEl.appendChild(cake);
+
+      const button = document.createElement("button");
+      button.textContent = "Open your gift 🎁";
+      button.style.padding = "10px 20px";
+      button.style.fontSize = "16px";
+      button.style.border = "none";
+      button.style.borderRadius = "10px";
+      button.style.background = "#ff4da6";
+      button.style.color = "white";
+      button.style.cursor = "pointer";
+      button.style.marginTop = "15px";
+      button.onclick = ()=> alert("Love you ❤️ Have the best birthday ever! 🌸🎉");
+      resultEl.appendChild(button);
+    }
+
+    loadQuestion();
+  </script>
+
+  <style>
+    @keyframes fall {
+      0% { top: -10%; opacity: 1; }
+      100% { top: 110%; opacity: 0; }
+    }
+  </style>
+</body>
+</html>
